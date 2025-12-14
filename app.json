@@ -2,6 +2,11 @@
   "expo": {
     "name": "jarvis",
     "slug": "jarvis",
+    "extra": {
+      "eas": {
+        "projectId": "fb1faaf3-c471-4b80-bf7a-8a3f586fd42c"
+      }
+    },
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
