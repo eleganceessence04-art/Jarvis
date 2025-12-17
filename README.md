@@ -2,7 +2,7 @@ Good catch — this error is **NOT your fault**. Expo changed the game and your 
 Let’s fix it properly so your **GitHub Actions → Expo Go preview** works again 🔥
 
 ---
-
+ 
 ## ❌ What’s going wrong (simple words)
 
 ### 1️⃣ `expo publish` is DEAD
