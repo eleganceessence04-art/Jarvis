@@ -1,4 +1,4 @@
-name: Expo OTA Update
+name: Build APK and Push to apk branch
 
 on:
   push:
@@ -6,7 +6,7 @@ on:
       - main
 
 jobs:
-  update:
+  build-apk:
     runs-on: ubuntu-latest
 
     steps:
@@ -17,18 +17,36 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 18
-          cache: npm
 
-      - name: Install dependencies (NPM ONLY)
+      - name: Install dependencies
         run: npm install
 
-      - name: Setup Expo & EAS (NO YARN)
-        uses: expo/expo-github-action@v8
-        with:
-          expo-version: latest
-          eas-version: latest
-          token: ${{ secrets.EXPO_TOKEN }}
-          packager: npm
+      - name: Install Expo & EAS
+        run: |
+          npm install -g expo-cli eas-cli
 
-      - name: Publish OTA Update
-        run: eas update --branch production --auto --non-interactive
+      - name: Expo login
+        run: eas whoami
+        env:
+          EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
+
+      - name: Build APK
+        run: |
+          eas build -p android --profile preview --non-interactive
+
+      - name: Download APK
+        run: |
+          mkdir apk
+          eas build:list --platform android --limit 1 --json > build.json
+          APK_URL=$(cat build.json | jq -r '.[0].artifacts.buildUrl')
+          curl -L "$APK_URL" -o apk/app.apk
+
+      - name: Push APK to apk branch
+        run: |
+          git config user.name "github-actions"
+          git config user.email "actions@github.com"
+          git checkout apk
+          cp apk/app.apk ./app.apk
+          git add app.apk
+          git commit -m "🚀 New APK build"
+          git push origin apk
